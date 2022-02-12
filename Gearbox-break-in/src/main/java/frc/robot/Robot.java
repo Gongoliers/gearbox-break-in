@@ -55,19 +55,23 @@ public class Robot extends TimedRobot {
  
   private void onDataChange() {
     m_seconds = SmartDashboard.getNumber("Seconds", m_seconds);
-    m_speed_target = SmartDashboard.getNumber("Speed", m_speed);
+    m_speed_target = SmartDashboard.getNumber("Speed Target", m_speed);
     if (-1 > m_speed_target | m_speed_target < 1) {m_speed_target = m_speed_target/100;}
     m_RampUp = SmartDashboard.getNumber("Ramp Up", m_RampUp);
     /// TODO: get values from SENDABLE CHOOSER
-    SmartDashboard.putBoolean("Auto", true); // CHANGEABLE
+    // SmartDashboard.putBoolean("Auto", true); // CHANGEABLE
     SmartDashboard.putNumber("Seconds Remaining", m_seconds_remaining); // STATIC
     SmartDashboard.putNumber("Seconds", m_seconds);
+    SmartDashboard.putNumber("Speed Target", m_speed_target)
     SmartDashboard.putNumber("Ramp Up", m_RampUp); // CHANGEABLE
     SmartDashboard.putNumber("Repetitions", m_repetitions); // STATIC
     SmartDashboard.putBoolean("Reverse?", m_reverse); // STATIC
   }
  
   private double getSpeed() {
+    if (m_speed_target != m_speed && m_speed_target != 0) {
+      m_speed = m_speed_target;
+    }
     double speed = m_speed;
     // RAMP UP
     if (m_seconds_periodic < m_RampUp) {
@@ -125,11 +129,12 @@ public class Robot extends TimedRobot {
  
   @Override
   public void robotInit() {
-    SendableChooser<Boolean> auto = new SendableChooser<Boolean>();
-    auto.addOption("Auto", true);
-    auto.addOption("Manual", false);
-    auto.setDefaultOption("Auto", true);
-    SmartDashboard.putData(auto);
+    // TODO SENDABLECHOOSER NOT WORKING
+    // SendableChooser<Boolean> auto = new SendableChooser<Boolean>();
+    // auto.addOption("Auto", true);
+    // auto.addOption("Manual", false);
+    // auto.setDefaultOption("Auto", true);
+    // SmartDashboard.putData(auto);
     SmartDashboard.putBoolean("Auto", true); // CHANGEABLE
     SmartDashboard.putNumber("Seconds Remaining", m_seconds_remaining); // STATIC
     SmartDashboard.putNumber("Seconds", m_seconds); // CHANGEABLE
