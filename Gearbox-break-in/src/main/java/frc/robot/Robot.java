@@ -1,6 +1,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -8,18 +10,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
+
+  // IMPORTANT CONFIG
+  private String m_MotorControllerType = "SRX"; // EIHTER SRX | FX | SPX
+
+  // ONLY ONE MOTOR PORT WILL BE USED
+  // MAP ALL MOTORS TO BREAK IN TO THIS PORT
   private MotorController motor1;
   private int m_motor1_port = 0;
 
-  private MotorController motor2;
-  private int m_motor2_port = 1; 
-
+  // CHANGE THIS STUFF
   private double m_seconds = 0;
   private double m_seconds_periodic = 0; 
   private double m_seconds_remaining = m_seconds; 
   private boolean m_reverse = false;
 
-  
   
   // Smartdashboard Values
   private boolean m_auto = false;
@@ -33,14 +38,17 @@ public class Robot extends TimedRobot {
 
 
   public Robot() {
+    if (m_MotorControllerType == "SRX") {
+    motor1 = new WPI_TalonSRX(m_motor1_port);
+  } else if (m_MotorControllerType == "FX") {
     motor1 = new WPI_TalonFX(m_motor1_port);
-    motor2 = new WPI_TalonFX(m_motor2_port);
-
+  } else if (m_MotorControllerType == "SPX") {
+    motor1 = new WPI_VictorSPX(m_motor1_port);
+  }
   }
   
   private void spin(double speed) {
     motor1.set(speed);
-    motor2.set(-speed);
   }
 
   private void onDataChange() {
@@ -49,13 +57,20 @@ public class Robot extends TimedRobot {
     if (m_speed > 1) {m_speed = m_speed/100;}
     m_RampUp = SmartDashboard.getNumber("Ramp Up", m_RampUp);
     /// TODO: get values from SENDABLE CHOOSER
+    SmartDashboard.putBoolean("Auto", true); // CHANGEABLE
+    SmartDashboard.putNumber("Seconds Remaining", m_seconds_remaining); // STATIC
+    SmartDashboard.putNumber("Seconds", m_seconds); // CHANGEABLE
+    SmartDashboard.putNumber("Speed", m_speed); // CHANGEABLE
+    SmartDashboard.putNumber("Ramp Up", m_RampUp); // CHANGEABLE
+    SmartDashboard.putNumber("Repetitions", m_repetitions); // STATIC
+    SmartDashboard.putBoolean("Reverse?", m_reverse); // STATIC
   }
 
   private double getSpeed() {
     double speed = m_speed;
     // RAMP UP
-    if (m_seconds < m_RampUp) {
-      return (speed/m_RampUp)/m_seconds;
+    if (m_seconds_periodic < m_RampUp) {
+      return (speed*(m_seconds_periodic/m_RampUp));
     }
 
     // REVERSING GEAR BOX
