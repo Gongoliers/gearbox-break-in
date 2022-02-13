@@ -90,6 +90,7 @@ public class Robot extends TimedRobot {
       }
       m_seconds_periodic = 0; 
     }
+    speed = Math.round(speed*1000.0)/1000.0;
     if (m_reverse) {
     return -speed;
     } else {
